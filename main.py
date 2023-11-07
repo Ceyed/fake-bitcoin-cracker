@@ -31,8 +31,23 @@ def timer_thread():
             time.sleep(1)
 
 
+def check_password_file_length():
+    if len(WORDS):
+        if values['-12-']:
+            if len(WORDS) < 12:
+                window['-ERROR-'].update('Words are less than 12')
+            else:
+                window['-ERROR-'].update('')
+
+        if values['-24-']:
+            if len(WORDS) < 24:
+                window['-ERROR-'].update('Words are less than 24')
+            else:
+                window['-ERROR-'].update('')
+
+
 layout = [   
-    [sg.Text('Key Types:\t', font=('Helvetica', 13), justification='left'), sg.Radio('12 Keys', 'key_length', default=True, key='-12-'), sg.Radio('24 Keys', 'key_length', key='-24-')],
+    [sg.Text('Key Types:\t', font=('Helvetica', 13), justification='left'), sg.Radio('12 Keys', 'key_length', default=True, key='-12-', enable_events=True), sg.Radio('24 Keys', 'key_length', key='-24-', enable_events=True)],
     [sg.Text('Password file:\t', font=('Helvetica', 13)), sg.In(key='-FILE-', enable_events=True, readonly=True, text_color="black", justification='left'), sg.FileBrowse(key='-BROWSE-')],
     [sg.Text('', key='-ERROR-', text_color='red')],
     [sg.Output(size=(69, 10), key='-OUTPUT-')],
@@ -57,16 +72,15 @@ while True:
                 
                 with open(values['-FILE-'], 'r') as f:
                     WORDS = f.read().splitlines()
-                
-                if values['-12-'] and len(WORDS) < 12:
-                    window['-ERROR-'].update('Words are less than 12')
 
-                if values['-24-'] and len(WORDS) < 24:
-                    window['-ERROR-'].update('Words are less than 24')
+                check_password_file_length()
 
         else:
             window['-ERROR-'].update('Error: Password file must be a .txt file')
             window['-START-'].update(disabled=True)
+
+    if event in ['-12-', '-24-']:
+        check_password_file_length()
 
     if event == '-START-':
         if FIRST_TIME:
