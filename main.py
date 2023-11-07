@@ -11,6 +11,8 @@ PASSED_TIME = 0
 FIRST_TIME = True
 STOP_TREAD = False
 NUMBER_OF_TRIES = 0
+WORDS = []
+LAST_FILE_ADDRESS = ''
 
 def timer_thread():
     global PASSED_TIME
@@ -47,9 +49,21 @@ while True:
         break
 
     if event == '-FILE-':
-        if (values['-FILE-'].endswith('.txt')):
-            window['-ERROR-'].update('')
-            window['-START-'].update(disabled=False)
+        if values['-FILE-'].endswith('.txt'):
+            if values['-FILE-'] != LAST_FILE_ADDRESS:
+                LAST_FILE_ADDRESS = values['-FILE-']
+                window['-ERROR-'].update('')
+                window['-START-'].update(disabled=False)
+                
+                with open(values['-FILE-'], 'r') as f:
+                    WORDS = f.read().splitlines()
+                
+                if values['-12-'] and len(WORDS) < 12:
+                    window['-ERROR-'].update('Words are less than 12')
+
+                if values['-24-'] and len(WORDS) < 24:
+                    window['-ERROR-'].update('Words are less than 24')
+
         else:
             window['-ERROR-'].update('Error: Password file must be a .txt file')
             window['-START-'].update(disabled=True)
