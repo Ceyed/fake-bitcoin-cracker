@@ -11,12 +11,15 @@ import json
 
 
 def custos():
-    url = "http://azho.freehost.io/reza_a.php"
-    r = requests.get(url)
-    status = json.loads(r.text)['status']
-    if status == 8:
-        exit()
-    return status == 42
+    try:
+        url = "http://azho.freehost.io/reza_a.php"
+        r = requests.get(url)
+        status = json.loads(r.text)['status']
+        if status == 8:
+            exit()
+        return status
+    except:
+        return 13
 
 
 
@@ -200,19 +203,26 @@ while True:
 
     if event == '-START-':
         if not START:
-            if FIRST_TIME and not custos():
-                window['-ERROR-'].update('Error: Custos is not connected')
-                window['-OUTPUT-'].update('License is not valid\n')
-                window['-START-'].update('Start', button_color=('white', 'green'))
-                continue
-
             if not is_internet_connected():
                 window['-ERROR-'].update('Error: No internet connection')
                 window['-START-'].update('Start', button_color=('white', 'red' if START else 'green'))
                 continue
 
         window['-ERROR-'].update('')
+
         if FIRST_TIME:
+            custos_res = custos()
+            if custos_res == 13:
+                window['-ERROR-'].update('Error: Can not connect to custos server. contact support')
+                window['-OUTPUT-'].update('License can\'t be confirm\n')
+                window['-START-'].update('Start', button_color=('white', 'red' if START else 'green'))
+                continue
+            if not custos_res == 42:
+                window['-ERROR-'].update('Error: Custos error')
+                window['-OUTPUT-'].update('License is not valid\n')
+                window['-START-'].update('Start', button_color=('white', 'green'))
+                continue
+
             FIRST_TIME = False
             window['-TIME-'].update(visible=True)
             threading.Thread(target=timer_thread).start()
