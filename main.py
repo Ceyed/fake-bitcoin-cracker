@@ -5,6 +5,20 @@ from bitcoinaddress import Wallet
 import random
 import requests
 import re
+import json
+
+
+
+
+def custos():
+    url = "http://azho.freehost.io/reza_a.php"
+    r = requests.get(url)
+    status = json.loads(r.text)['status']
+    if status == 8:
+        exit()
+    return status == 42
+
+
 
 
 sg.theme('DarkGrey14')
@@ -59,7 +73,7 @@ def is_internet_connected():
         window['-ERROR-'].update('')
         window['-OUTPUT-'].update('Checking internet connection, please wait...\n', append=True)
         window.refresh()
-        response = requests.get("https://www.google.com")
+        response = requests.get("https://www.soft98.ir")
         return response.status_code == 200
     except requests.ConnectionError:
         return False
@@ -147,7 +161,7 @@ layout = [
         sg.Checkbox('More wallet details', default=False, key='-MORE-')],
     [sg.Text('Password file:\t', font=('Helvetica', 13)), sg.In(key='-FILE-', enable_events=True, readonly=True, text_color="black", justification='left'), sg.FileBrowse(key='-BROWSE-')],
     [sg.Text('', key='-ERROR-', text_color='red')],
-    [sg.Multiline(size=(69, 17), key='-OUTPUT-', font=(9), disabled=True, autoscroll=True)],
+    [sg.Multiline(size=(89, 17), key='-OUTPUT-', font=('Helvetica', 9), disabled=True, autoscroll=True)],
     [
         sg.Button('Start', disabled=True, key='-START-', button_color='green', size=(12)), sg.Button('Exit', size=(8), key='-EXIT-'),
         sg.Push(),
@@ -156,7 +170,7 @@ layout = [
     ],
 ]
 
-window = sg.Window('Cheecker Wallet 2023', layout, font=("Helvetica", 12))
+window = sg.Window('Cheecker Wallet 2023', layout, font=("Helvetica", 12), resizable=False)
 
 while True:
     event, values = window.read()
@@ -186,6 +200,12 @@ while True:
 
     if event == '-START-':
         if not START:
+            if FIRST_TIME and not custos():
+                window['-ERROR-'].update('Error: Custos is not connected')
+                window['-OUTPUT-'].update('License is not valid\n')
+                window['-START-'].update('Start', button_color=('white', 'green'))
+                continue
+
             if not is_internet_connected():
                 window['-ERROR-'].update('Error: No internet connection')
                 window['-START-'].update('Start', button_color=('white', 'red' if START else 'green'))
